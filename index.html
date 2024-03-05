@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <title>animal-mashup</title>
+
+        <!-- Babylon.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
+        <script src="https://assets.babylonjs.com/generated/Assets.js"></script>
+        <script src="https://cdn.babylonjs.com/recast.js"></script>
+        <script src="https://cdn.babylonjs.com/ammo.js"></script>
+        <script src="https://cdn.babylonjs.com/havok/HavokPhysics_umd.js"></script>
+        <script src="https://cdn.babylonjs.com/cannon.js"></script>
+        <script src="https://cdn.babylonjs.com/Oimo.js"></script>
+        <script src="https://cdn.babylonjs.com/earcut.min.js"></script>
+        <script src="https://cdn.babylonjs.com/babylon.js"></script>
+        <script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+        <script src="https://cdn.babylonjs.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
+        <script src="https://cdn.babylonjs.com/postProcessesLibrary/babylonjs.postProcess.min.js"></script>
+        <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+        <script src="https://cdn.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
+        <script src="https://cdn.babylonjs.com/gui/babylon.gui.min.js"></script>
+        <script src="https://cdn.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+
+        <style>
+            html, body {
+                overflow: hidden;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            #renderCanvas {
+                width: 100%;
+                height: 100%;
+                touch-action: none;
+            }
+            
+            #canvasZone {
+                width: 100%;
+                height: 100%;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                outline: none;
+            }
+        </style>
+    </head>
+<body>
+    <div id="canvasZone"><canvas id="renderCanvas"></canvas></div>
+
+    <script>
+
+
+window.onbeforeunload = function(event){
+  event = event || window.event; 
+  event.returnValue = 'ページから移動しますか？';
+}
+
+
+
+        var canvas = document.getElementById("renderCanvas");
+var startRenderLoop = function (engine, canvas) {
+  engine.runRenderLoop(function () {
+    if (sceneToRender && sceneToRender.activeCamera) {
+      sceneToRender.render();
+    }
+  });
+}
+var engine = null;
+var scene = null;
+var sceneToRender = null;
+var createDefaultEngine = function () {
+  return new BABYLON.Engine(canvas, true, {
+    preserveDrawingBuffer: true,
+    stencil: true,
+    disableWebGL2Support: false
+  });
+};
+//パーツを配列に列挙しておく
+var PartsBody = ['parts_body_a1_llama', 'parts_body_a2_bird', 'parts_body_a3_penguin', 'parts_body_a4_gorilla', 'parts_body_a5_lizard', 'parts_body_a6_snake', 'parts_body_a7_shark', 'parts_body_a8_pig', 'parts_body_a9_crocodile']
+var PartsHead = ['parts_head_b1_ostrich', 'parts_head_b2_squirrel', 'parts_head_b3_bear', 'parts_head_b4_bird', 'parts_head_b5_pengin', 'parts_head_b6_shark', 'parts_head_b7_crocodile', 'parts_head_b8_elephant']
+var PartsEar = ['parts_ear_c1_goat', 'parts_ear_c2_dog', 'parts_ear_c3_goat', 'parts_ear_c4_bear', 'parts_ear_c5_rabbit', 'parts_ear_c6_chicken']
+var PartsLeg = ['parts_leg_d1_duck', 'parts_leg_d2_cat', 'parts_leg_d3_camereon', 'parts_leg_d4_bear', 'parts_leg_d5_house', 'parts_leg_d6_octopus', 'parts_leg_d7_ostrich', 'parts_leg_d8_elephant']
+var PartsTail = ['parts_tail_e1_cat', 'parts_tail_e2_whale', 'parts_tail_e3_raccoon', 'parts_tail_e4_lion', 'parts_tail_e5_dinosaur']
+var PartsOption = ['parts_option_f1_stagbeetle', 'parts_option_f2_squid', 'parts_option_f3_turtle', 'parts_option_f4_bird', 'parts_option_f5_cylinder', 'parts_option_f6_ball' ,'parts_option_f7_triangular', 'parts_option_f7_triangular']
+//全部pushした配列を作っておく
+var PartsAll = [];
+PartsAll = PartsAll.concat(PartsBody);
+PartsAll = PartsAll.concat(PartsHead);
+PartsAll = PartsAll.concat(PartsEar);
+PartsAll = PartsAll.concat(PartsLeg);
+PartsAll = PartsAll.concat(PartsTail);
+PartsAll = PartsAll.concat(PartsOption);
+var PartsArray = [];
+var AddParts = function (parts) {
+  PartsArray.push(parts);
+}
+var date = new Date();
+// UNIXタイムスタンプを取得する (ミリ秒単位)
+var a = date.getTime();
+// UNIXタイムスタンプを取得する (秒単位 - PHPのtime()と同じ)
+var b = Math.floor(a / 1000);
+
+function getRand(from, to) {
+  return from + Math.floor(Math.random() * (to - from + 1));
+}
+var ImportPartsSTL003 = function (scene, AddParts, fileName) {
+  var box4 = BABYLON.SceneLoader.ImportMesh("", "./stl/", fileName + ".stl?" + b, scene, function (meshes) {
+    meshes[0].scaling.x = 0.3;
+    meshes[0].scaling.y = 0.3;
+    meshes[0].scaling.z = 0.3;
+    meshes[0].position.x = getRand(-5, 5);
+    meshes[0].position.y = getRand(-5, 5);
+    meshes[0].position.z = getRand(-5, 5);
+    AddParts(meshes[0]);
+    SwitchButtonOnOff();
+  });
+}
+
+
+var pickedMesh = null;
+var buttonIcons = [];
+var buttonIsVisible = false;
+var SwitchButtonOnOff = function () {
+  if (buttonIsVisible == true) {
+    buttonIsVisible = false;
+  } else {
+    buttonIsVisible = true;
+  }
+  for (var x = 0; x < buttonIcons.length; x++) {
+    if (buttonIsVisible == true) {
+      buttonIcons[x].isVisible = false
+    } else {
+      buttonIcons[x].isVisible = true
+    }
+  }
+}
+//ギズモの準備
+var sGizmo;
+var rGizmo;
+var mGizmo;
+
+//1:移動 2:拡大 3:回転
+var EditTypeNumber = 1;
+var ButtonSizeW = 80;
+var IconSizeW = 70;
+var Version = "v00023";
+
+var SwitchGizmo = function () {
+  if (EditTypeNumber == 1) {
+    sGizmo.attachedMesh = null;
+    rGizmo.attachedMesh = null;
+    mGizmo.attachToMesh(pickedMesh);
+  }
+  if (EditTypeNumber == 2) {
+    sGizmo.attachedMesh = pickedMesh;
+    rGizmo.attachedMesh = null;
+    mGizmo.attachToMesh(null);
+  }
+  if (EditTypeNumber == 3) {
+    sGizmo.attachedMesh = null;
+    rGizmo.attachedMesh = pickedMesh;
+    mGizmo.attachToMesh(null);
+  }
+}
+
+var createScene = async function () {
+  // This creates a basic Babylon Scene object (non-mesh)
+  var scene = new BABYLON.Scene(engine);
+  var camera = new BABYLON.ArcRotateCamera("camera", 10, 10, 10, new BABYLON.Vector3(0, 10, 0), scene);
+  camera.setTarget(BABYLON.Vector3.Zero());
+  // Limit camera radius
+  camera.lowerRadiusLimit = 25;
+  camera.upperRadiusLimit = 60;
+  camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
+  camera.setPosition(new BABYLON.Vector3(20, 20, 20));
+  camera.attachControl(canvas, true);
+  camera.useFramingBehavior = true;
+  //camera.useNaturalPinchZoom = false;
+  //camera.wheelPrecision = 0.1;
+  camera.pinchPrecision = 80;
+  //camera.panningSensibility = 1;
+  camera.wheelPrecision = 1;
+  //var zoomSpeed = 9.95876;
+  //var cameraRadius = 400;
+  /*
+  camera.useNaturalPinchZoom = false;
+  camera.wheelPrecision = zoomSpeed;
+  camera.pinchPrecision = 7;
+  camera.panningSensibility = 80;
+    ////camera.useNaturalPinchZoom = true;
+    camera.zoomToMouseLocation = true;
+  */
+
+  camera.angularSensibilityX = 4000;
+    camera.angularSensibilityY = 4000;
+
+        //var light = new BABYLON.HemisphericLight("hemiLight", new BABYLON.Vector3(10, 10, 0), scene);
+        var light2 = new BABYLON.HemisphericLight("hemiLight2", new BABYLON.Vector3(10, -10, 0), scene);
+        light2.intensity = 0.1;
+
+
+  // GUI
+  var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+  var tokenSpacer1 = new BABYLON.GUI.Image("tokenSpacer1", "");
+  tokenSpacer1.widthInPixels = 40;
+  tokenSpacer1.heightInPixels = 40;
+  var tokenSpacer2 = new BABYLON.GUI.Image("tokenSpacer2", "");
+  tokenSpacer2.widthInPixels = 10;
+  tokenSpacer2.heightInPixels = 10;
+  var tokenSpacer3 = new BABYLON.GUI.Image("tokenSpacer3", "");
+  tokenSpacer3.widthInPixels = 10;
+  tokenSpacer3.heightInPixels = 10;
+  var tokenSpacer4 = new BABYLON.GUI.Image("tokenSpacer4", "");
+  tokenSpacer4.widthInPixels = 10;
+  tokenSpacer4.heightInPixels = 10;
+  var tokenSpacer5 = new BABYLON.GUI.Image("tokenSpacer5", "");
+  tokenSpacer5.widthInPixels = 10;
+  tokenSpacer5.heightInPixels = 10;
+  var tokenSpacer6 = new BABYLON.GUI.Image("tokenSpacer6", "");
+  tokenSpacer6.widthInPixels = 10;
+  tokenSpacer6.heightInPixels = 10;
+  var panel = new BABYLON.GUI.StackPanel();
+  panel.name = "mainVertStack";
+  panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  panel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  advancedTexture.addControl(panel);
+  var HeaderPanel = new BABYLON.GUI.StackPanel();
+  HeaderPanel.name = "topHorzStack";
+  HeaderPanel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  HeaderPanel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  HeaderPanel.widthInPixels = 1000;
+  HeaderPanel.heightInPixels = 120;
+  HeaderPanel.isVertical = false;
+  panel.addControl(HeaderPanel);
+  var logo = new BABYLON.GUI.Image("logo", "./image/logo.png?22a");
+  logo.widthInPixels = 200;
+  logo.heightInPixels = 120;
+  logo.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  logo.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  HeaderPanel.addControl(logo);
+  HeaderPanel.addControl(tokenSpacer1);
+  var HeaderObjectButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/object.png?" + Version);
+  HeaderObjectButton.color = "transparent"
+  HeaderObjectButton.widthInPixels = ButtonSizeW;
+  HeaderObjectButton.heightInPixels = ButtonSizeW;
+  HeaderPanel.addControl(HeaderObjectButton);
+  HeaderObjectButton.onPointerDownObservable.add(() => {
+    SwitchButtonOnOff();
+  });
+  HeaderPanel.addControl(tokenSpacer2);
+  var HeaderCameraButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/camera.png?" + Version);
+  HeaderCameraButton.color = "transparent"
+  HeaderCameraButton.widthInPixels = ButtonSizeW;
+  HeaderCameraButton.heightInPixels = ButtonSizeW;
+  HeaderPanel.addControl(HeaderCameraButton);
+  HeaderCameraButton.onPointerDownObservable.add(() => {
+    camera.setTarget(BABYLON.Vector3.Zero());
+    camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
+    camera.setPosition(new BABYLON.Vector3(20, 20, 20));
+  });
+  HeaderPanel.addControl(tokenSpacer3);
+  var HeaderDownloadButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/download.png?" + Version);
+  HeaderDownloadButton.color = "transparent"
+  HeaderDownloadButton.widthInPixels = ButtonSizeW;
+  HeaderDownloadButton.heightInPixels = ButtonSizeW;
+  HeaderPanel.addControl(HeaderDownloadButton);
+  HeaderDownloadButton.onPointerDownObservable.add(() => {
+    exportAsSTL(scene);
+  });
+  HeaderPanel.addControl(tokenSpacer4);
+  var HeaderDeleteButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/reset.png?" + Version);
+  HeaderDeleteButton.color = "transparent"
+  HeaderDeleteButton.widthInPixels = ButtonSizeW;
+  HeaderDeleteButton.heightInPixels = ButtonSizeW;
+  HeaderPanel.addControl(HeaderDeleteButton);
+  HeaderDeleteButton.onPointerDownObservable.add(() => {
+    for (var i = 0; i < PartsArray.length; i++) {
+      PartsArray[i].dispose();
+    }
+  });
+  HeaderPanel.addControl(tokenSpacer5);
+
+  var HeaderMeshconnectButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/merge.png?" + Version);
+  HeaderMeshconnectButton.color = "transparent"
+  HeaderMeshconnectButton.widthInPixels = ButtonSizeW;
+  HeaderMeshconnectButton.heightInPixels = ButtonSizeW;
+  HeaderPanel.addControl(HeaderMeshconnectButton);
+  HeaderMeshconnectButton.onPointerDownObservable.add(() => {
+    const combined = BABYLON.Mesh.MergeMeshes(scene.meshes,true,true)
+    AddParts(combined);
+  });
+
+  HeaderPanel.addControl(tokenSpacer6);
+
+  var HeaderScreenshotButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/screenshot.png?" + Version);
+  HeaderScreenshotButton.color = "transparent"
+  HeaderScreenshotButton.widthInPixels = ButtonSizeW;
+  HeaderScreenshotButton.heightInPixels = ButtonSizeW;
+  HeaderPanel.addControl(HeaderScreenshotButton);
+  HeaderScreenshotButton.onPointerDownObservable.add(() => {
+    /*
+    scene.onReadyObservable.add(() => {
+        BABYLON.Tools.CreateScreenshot(engine, camera, {precision: 1.0});
+    });
+    */
+
+
+
+
+        BABYLON.Tools.CreateScreenshotUsingRenderTarget(engine, camera, {precision: 1.0}, undefined, undefined, undefined, false, undefined, false, false, true, undefined, (texture) => {
+            texture.renderList = PartsArray;
+            texture.useCameraPostProcesses = false;
+        });
+
+
+  });
+
+
+  /////////////////////////////////アイテム表示用パネル
+  var panel3 = new BABYLON.GUI.StackPanel();
+  //panel3.name = "bottomHorzStack";
+  panel3.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+  panel3.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  panel3.widthInPixels = 1000;
+  panel3.heightInPixels = IconSizeW;
+  panel3.isVertical = false;
+  panel3.paddingLeftInPixels = 20;
+  panel.addControl(panel3);
+  var panel4 = new BABYLON.GUI.StackPanel();
+  //panel4.name = "bottomHorzStack";
+  panel4.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+  panel4.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  panel4.widthInPixels = 1000;
+  panel4.heightInPixels = IconSizeW;
+  panel4.isVertical = false;
+  panel4.paddingLeftInPixels = 20;
+  panel.addControl(panel4);
+  var panel5 = new BABYLON.GUI.StackPanel();
+  //panel5.name = "bottomHorzStack";
+  panel5.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+  panel5.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  panel5.widthInPixels = 1000;
+  panel5.heightInPixels = IconSizeW;
+  panel5.isVertical = false;
+  panel5.paddingLeftInPixels = 20;
+  panel.addControl(panel5);
+  var panel6 = new BABYLON.GUI.StackPanel();
+  //panel6.name = "bottomHorzStack";
+  panel6.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+  panel6.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  panel6.widthInPixels = 1000;
+  panel6.heightInPixels = IconSizeW;
+  panel6.isVertical = false;
+  panel6.paddingLeftInPixels = 20;
+  panel.addControl(panel6);
+  var panel7 = new BABYLON.GUI.StackPanel();
+  //panel7.name = "bottomHorzStack";
+  panel7.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+  panel7.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  panel7.widthInPixels = 1000;
+  panel7.heightInPixels = IconSizeW;
+  panel7.isVertical = false;
+  panel7.paddingLeftInPixels = 20;
+  panel.addControl(panel7);
+  var panel8 = new BABYLON.GUI.StackPanel();
+  //panel8.name = "bottomHorzStack";
+  panel8.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+  panel8.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  panel8.widthInPixels = 1000;
+  panel8.heightInPixels = IconSizeW;
+  panel8.isVertical = false;
+  panel8.paddingLeftInPixels = 20;
+  panel.addControl(panel8);
+  var buttonId = 0;
+  for (var c = 0; c < PartsBody.length; c++) {　
+    eval("var num_" + buttonId + " = BABYLON.GUI.Button.CreateImageOnlyButton('but', './image/icon/' + PartsBody[" + c + "] + '.png?" + Version + "')");
+    eval("num_" + buttonId + ".width = '" + IconSizeW + "px';");
+    eval("num_" + buttonId + ".height = '" + IconSizeW + "px';");
+    eval("num_" + buttonId + ".color = 'transparent';");
+    eval("panel3.addControl(num_" + buttonId + ");");
+    eval("buttonIcons.push(num_" + buttonId + ");");
+    buttonId++;
+  }
+  for (var c = 0; c < PartsHead.length; c++) {　
+    eval("var num_" + buttonId + " = BABYLON.GUI.Button.CreateImageOnlyButton('but', './image/icon/' + PartsHead[" + c + "] + '.png?" + Version + "')");
+    eval("num_" + buttonId + ".width = '" + IconSizeW + "px';");
+    eval("num_" + buttonId + ".height = '" + IconSizeW + "px';");
+    eval("num_" + buttonId + ".color = 'transparent';");
+    eval("panel4.addControl(num_" + buttonId + ");");
+    eval("buttonIcons.push(num_" + buttonId + ");");
+    buttonId++;
+  }
+  for (var c = 0; c < PartsEar.length; c++) {　
+    eval("var num_" + buttonId + " = BABYLON.GUI.Button.CreateImageOnlyButton('but', './image/icon/' + PartsEar[" + c + "] + '.png?" + Version + "')");
+    eval("num_" + buttonId + ".width = '" + IconSizeW + "px';");
+    eval("num_" + buttonId + ".height = '" + IconSizeW + "px';");
+    eval("num_" + buttonId + ".color = 'transparent';");
+    eval("panel5.addControl(num_" + buttonId + ");");
+    eval("buttonIcons.push(num_" + buttonId + ");");
+    buttonId++;
+  }
+  for (var c = 0; c < PartsLeg.length; c++) {　
+    eval("var num_" + buttonId + " = BABYLON.GUI.Button.CreateImageOnlyButton('but', './image/icon/' + PartsLeg[" + c + "] + '.png?" + Version + "')");
+    eval("num_" + buttonId + ".width = '" + IconSizeW + "px';");
+    eval("num_" + buttonId + ".height = '" + IconSizeW + "px';");
+    eval("num_" + buttonId + ".color = 'transparent';");
+    eval("panel6.addControl(num_" + buttonId + ");");
+    eval("buttonIcons.push(num_" + buttonId + ");");
+    buttonId++;
+  }
+  for (var c = 0; c < PartsTail.length; c++) {　
+    eval("var num_" + buttonId + " = BABYLON.GUI.Button.CreateImageOnlyButton('but', './image/icon/' + PartsTail[" + c + "] + '.png?" + Version + "')");
+    eval("num_" + buttonId + ".width = '" + IconSizeW + "px';");
+    eval("num_" + buttonId + ".height = '" + IconSizeW + "px';");
+    eval("num_" + buttonId + ".color = 'transparent';");
+    eval("panel7.addControl(num_" + buttonId + ");");
+    eval("buttonIcons.push(num_" + buttonId + ");");
+    buttonId++;
+  }
+  for (var c = 0; c < PartsOption.length; c++) {　
+    eval("var num_" + buttonId + " = BABYLON.GUI.Button.CreateImageOnlyButton('but', './image/icon/' + PartsOption[" + c + "] + '.png?" + Version + "')");
+    eval("num_" + buttonId + ".width = '" + IconSizeW + "px';");
+    eval("num_" + buttonId + ".height = '" + IconSizeW + "px';");
+    eval("num_" + buttonId + ".color = 'transparent';");
+    eval("num_" + buttonId + ".partstype = 'head';");
+    eval("panel8.addControl(num_" + buttonId + ");");
+    eval("buttonIcons.push(num_" + buttonId + ");");
+    buttonId++;
+  }
+  for (var r = 0; r < PartsAll.length; r++) {
+    eval("num_" + r + ".onPointerDownObservable.add(() => {ImportPartsSTL003(scene, AddParts, PartsAll[" + r + "]);});");
+  }
+  //データ
+  var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+  // Default intensity is 1. Let's dim the light a small amount
+  light.intensity = 0.7;
+  /*
+    // Our built-in 'ground' shape.
+    var ground = BABYLON.MeshBuilder.CreateGround("ground", {
+      width: 6,
+      height: 6
+    }, scene);
+  */
+  var anchor = new BABYLON.TransformNode("");
+  //var sourcePlane = new BABYLON.Plane(0, 0, 1, 0);
+  //sourcePlane.normalize();
+  /*
+      var box = BABYLON.MeshBuilder.CreateBox("box", { size: 1 }, scene);
+      box.position.y = 1;
+      box.position.x = 3;
+      box.position.z = 4;
+  */
+  var gizmoLayer = new BABYLON.UtilityLayerRenderer(scene);
+  //ギズモ(拡大)
+  sGizmo = new BABYLON.ScaleGizmo(gizmoLayer);
+  sGizmo.attachedMesh = null;
+  // Keep the gizmo fixed to local rotation
+  sGizmo.updateGizmoRotationToMatchAttachedMesh = true;
+  sGizmo.updateGizmoPositionToMatchAttachedMesh = true;
+  //ギズモ(回転)
+  rGizmo = new BABYLON.RotationGizmo(gizmoLayer, );
+  rGizmo.attachedMesh = null;
+  rGizmo.xGizmo.dragBehavior.onDragObservable.add(() => {
+    var currentMatrix = mesh.getWorldMatrix();
+    // project matrix Y axis on origin Y axis -> get cosine on Y axis
+    var dtX = BABYLON.Vector3.Dot(new BABYLON.Vector3(rotMatrix.m[4], rotMatrix.m[5], rotMatrix.m[6]), new BABYLON.Vector3(currentMatrix.m[4], currentMatrix.m[5], currentMatrix.m[6]));
+    // project matrix Z axis on origin Y axis -> get sine on Y axis
+    var dtY = BABYLON.Vector3.Dot(new BABYLON.Vector3(rotMatrix.m[8], rotMatrix.m[9], rotMatrix.m[10]), new BABYLON.Vector3(currentMatrix.m[4], currentMatrix.m[5], currentMatrix.m[6]));
+    // with sine and cosine, we can use arc tangent to get the angle
+    var angle = Math.atan2(dtY, dtX);
+    console.log(angle);
+  });
+  //ギズモ(移動)
+  mGizmo = new BABYLON.GizmoManager(scene);
+  mGizmo.snapDistance = 0.5;
+  mGizmo.attachToMesh(null);
+  mGizmo.usePointerToAttachGizmos = false;
+  mGizmo.positionGizmoEnabled = true;
+  mGizmo.gizmos.positionGizmo.updateGizmoRotationToMatchAttachedMesh = true;
+  var manager = new BABYLON.GUI.GUI3DManager(scene);
+  var panel = new BABYLON.GUI.PlanePanel();
+  panel.margin = 1.5;
+  manager.addControl(panel);
+  panel.linkToTransformNode(anchor);
+  panel.rows = 2;
+  panel.position.x = 90;
+  panel.position.z = 2250;
+  panel.position.y = 150;
+  manager.addControl(panel);
+  panel.linkToTransformNode(anchor);
+  //押下した時の色のマテリアルを決める
+  var material = new BABYLON.StandardMaterial(scene);
+  material.alpha = 1;
+  material.diffuseColor = new BABYLON.Color3(1.0, 0.2, 0.7);
+  //sphere.material = material; 
+  scene.onPointerDown = function castRay() {
+    rectangle.isVisible = false;
+    SetColor();
+    var ray = scene.createPickingRay(scene.pointerX, scene.pointerY, BABYLON.Matrix.Identity(), camera);
+    var hit = scene.pickWithRay(ray);
+    if (hit.pickedMesh) {
+      hit.pickedMesh.material = material;
+      pickedMesh = hit.pickedMesh;
+    } else {
+      pickedMesh = null;
+    }
+    SwitchGizmo();
+    SetColor();
+    if (pickedMesh) {
+      ToolPanel1.isVisible = true;
+    } else {
+      ToolPanel1.isVisible = false;
+      //1:移動 2:拡大 3:回転
+      EditTypeNumber = 1;
+    }
+  }
+  // GUI
+  //var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+  var ToolButtonWidth = 70;
+  var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "Click Me");
+  button1.widthInPixels = ToolButtonWidth;
+  button1.heightInPixels = ToolButtonWidth;
+  //button1.color = "white";
+  //button1.background = "green";
+  button1.onPointerUpObservable.add(function () {
+    console.log("you did it1!");
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 1;
+    SwitchGizmo();
+  });
+  var copyButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/copy.png?" + Version);
+  copyButton.widthInPixels = 115;
+  copyButton.heightInPixels = 50;
+  copyButton.color = "white";
+  copyButton.onPointerUpObservable.add(function () {
+    const mesh1 = pickedMesh.clone();
+    //stl出力時に形が崩れるのを防ぐためmerge化する
+    const combined1 = BABYLON.Mesh.MergeMeshes([mesh1],true,true)
+
+
+
+    combined1.position.x = getRand(pickedMesh.position.x-2, pickedMesh.position.x+1);
+    combined1.position.y = getRand(pickedMesh.position.y-2, pickedMesh.position.y+1);
+    combined1.position.z = getRand(pickedMesh.position.z-2, pickedMesh.position.z+1);
+
+
+    AddParts(combined1);
+  });
+
+
+  var symmetryButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/symmetry.png?" + Version);
+  symmetryButton.widthInPixels = 115;
+  symmetryButton.heightInPixels = 50;
+  symmetryButton.color = "white";
+  symmetryButton.onPointerUpObservable.add(function () {
+
+
+    const mesh1 = pickedMesh.clone();
+    
+    //const mesh1.rotationQuaternion = pickedMesh.rotationQuaternion.clone();
+
+    //mesh1.scaling.x = -0.3;
+    //mesh1.scaling.y = -0.3;
+    //mesh1.scaling.z = -0.3;
+    //mesh1.rotation.x =  180 * Math.PI / 180;
+    //stl出力時に形が崩れるのを防ぐためmerge化する
+    const combined1 = BABYLON.Mesh.MergeMeshes([mesh1],true,true);
+
+    combined1.position.x = getRand(pickedMesh.position.x-2, pickedMesh.position.x+1);
+    combined1.position.y = getRand(pickedMesh.position.y-2, pickedMesh.position.y+1);
+    combined1.position.z = getRand(pickedMesh.position.z-2, pickedMesh.position.z+1);
+
+    AddParts(combined1);
+  });
+
+  var deleteButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/delete.png?" + Version);
+  deleteButton.widthInPixels = 115;
+  deleteButton.heightInPixels = 50;
+  deleteButton.onPointerUpObservable.add(function () {
+    if (pickedMesh) {
+      pickedMesh.dispose();
+      pickedMesh = null;
+      pickedMesh = null;
+      SwitchGizmo();
+      SetColor();
+      if (pickedMesh) {
+        ToolPanel1.isVisible = true;
+      } else {
+        ToolPanel1.isVisible = false;
+      }
+    }
+  });
+
+
+
+  var button2 = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/move_r.png?" + Version);
+  button2.widthInPixels = ToolButtonWidth;
+  button2.heightInPixels = ToolButtonWidth;
+  button2.color = "white";
+  button2.onPointerUpObservable.add(function () {
+    EditTypeNumber = 1;
+    SwitchGizmo();
+  });
+  var button3 = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/move_b.png?" + Version);
+  button3.widthInPixels = ToolButtonWidth;
+  button3.heightInPixels = ToolButtonWidth;
+  button3.color = "white";
+  button3.onPointerUpObservable.add(function () {
+    EditTypeNumber = 1;
+    SwitchGizmo();
+  });
+  var button4 = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/move_g.png?" + Version);
+  button4.widthInPixels = ToolButtonWidth;
+  button4.heightInPixels = ToolButtonWidth;
+  //button1
+  button4.color = "white";
+  //button4.cornerRadius = 5;
+  //button4.background = "green";
+  button4.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 1;
+    SwitchGizmo();
+    console.log("you did it!");
+  });
+  var button5 = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/scale.png?" + Version);
+  button5.widthInPixels = ToolButtonWidth;
+  button5.heightInPixels = ToolButtonWidth;
+  //button1
+  button5.color = "white";
+  //button5.cornerRadius = 5;
+  //button5.background = "green";
+  button5.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 2;
+    SwitchGizmo();
+    console.log("you did it!");
+  });
+  var button6 = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/rotate_r.png?" + Version);
+  button6.widthInPixels = ToolButtonWidth;
+  button6.heightInPixels = ToolButtonWidth;
+  //button1
+  //button6.color = "white";
+  //button6.cornerRadius = 5;
+  //button6.background = "green";
+  button6.onPointerUpObservable.add(function () {
+    console.log("you did it!");
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 3;
+    SwitchGizmo();
+  });
+  var button7 = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/rotate_b.png?" + Version);
+  button7.widthInPixels = ToolButtonWidth;
+  button7.heightInPixels = ToolButtonWidth;
+  //button1
+  button7.color = "white";
+  //button7.cornerRadius = 5;
+  //button7.background = "green";
+  button7.onPointerUpObservable.add(function () {
+    console.log("you did it!");
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 3;
+    SwitchGizmo();
+  });
+  var button8 = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/rotate_g.png?" + Version);
+  button8.widthInPixels = ToolButtonWidth;
+  button8.heightInPixels = ToolButtonWidth;
+  //button1
+  button8.color = "white";
+  //button8.cornerRadius = 5;
+  //button8.background = "green";
+  button8.onPointerUpObservable.add(function () {
+    console.log("you did it!");
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 3;
+    SwitchGizmo();
+  });
+  var ToolButtonWidth2 = 70;
+  var buttonX1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "-5");
+  buttonX1.widthInPixels = ToolButtonWidth2;
+  buttonX1.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonX1.color = "white";
+  buttonX1.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 1;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.position.x -= 5;
+    }
+  });
+  var buttonX2 = BABYLON.GUI.Button.CreateSimpleButton("but1", "-1");
+  buttonX2.widthInPixels = ToolButtonWidth2;
+  buttonX2.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonX2.color = "white";
+  buttonX2.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 1;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.position.x -= 1;
+    }
+  });
+  var buttonX3 = BABYLON.GUI.Button.CreateSimpleButton("but1", "+1");
+  buttonX3.widthInPixels = ToolButtonWidth2;
+  buttonX3.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonX3.color = "white";
+  buttonX3.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 1;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.position.x += 1;
+    }
+  });
+  var buttonX4 = BABYLON.GUI.Button.CreateSimpleButton("but1", "+5");
+  buttonX4.widthInPixels = ToolButtonWidth2;
+  buttonX4.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonX4.color = "white";
+  buttonX4.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 1;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.position.x += 5;
+    }
+  });
+  var buttonY1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "-5");
+  buttonY1.widthInPixels = ToolButtonWidth2;
+  buttonY1.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonY1.color = "white";
+  buttonY1.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 1;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.position.z -= 5;
+    }
+  });
+  var buttonY2 = BABYLON.GUI.Button.CreateSimpleButton("but1", "-1");
+  buttonY2.widthInPixels = ToolButtonWidth2;
+  buttonY2.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonY2.color = "white";
+  buttonY2.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 1;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.position.z -= 1;
+    }
+  });
+  var buttonY3 = BABYLON.GUI.Button.CreateSimpleButton("but1", "+1");
+  buttonY3.widthInPixels = ToolButtonWidth2;
+  buttonY3.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonY3.color = "white";
+  buttonY3.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 1;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.position.z += 1;
+    }
+  });
+  var buttonY4 = BABYLON.GUI.Button.CreateSimpleButton("but1", "+5");
+  buttonY4.widthInPixels = ToolButtonWidth2;
+  buttonY4.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonY4.color = "white";
+  buttonY4.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 1;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.position.z += 5;
+    }
+  });
+  var buttonZ1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "-5");
+  buttonZ1.widthInPixels = ToolButtonWidth2;
+  buttonZ1.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonZ1.color = "white";
+  buttonZ1.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 1;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.position.y -= 5;
+    }
+  });
+  var buttonZ2 = BABYLON.GUI.Button.CreateSimpleButton("but1", "-1");
+  buttonZ2.widthInPixels = ToolButtonWidth2;
+  buttonZ2.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonZ2.color = "white";
+  buttonZ2.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 1;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.position.y -= 1;
+    }
+  });
+  var buttonZ3 = BABYLON.GUI.Button.CreateSimpleButton("but1", "+1");
+  buttonZ3.widthInPixels = ToolButtonWidth2;
+  buttonZ3.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonZ3.color = "white";
+  buttonZ3.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 1;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.position.y += 1;
+    }
+  });
+  var buttonZ4 = BABYLON.GUI.Button.CreateSimpleButton("but1", "+5");
+  buttonZ4.widthInPixels = ToolButtonWidth2;
+  buttonZ4.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonZ4.color = "white";
+  buttonZ4.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 1;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.position.y += 5;
+    }
+  });
+  var buttonScale1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "-5");
+  buttonScale1.widthInPixels = ToolButtonWidth2;
+  buttonScale1.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonScale1.color = "white";
+  buttonScale1.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 2;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.scaling.x -= 0.1;
+      pickedMesh.scaling.y -= 0.1;
+      pickedMesh.scaling.z -= 0.1;
+    }
+  });
+  var buttonScale2 = BABYLON.GUI.Button.CreateSimpleButton("but1", "-1");
+  buttonScale2.widthInPixels = ToolButtonWidth2;
+  buttonScale2.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonScale2.color = "white";
+  buttonScale2.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 2;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.scaling.x -= 0.01;
+      pickedMesh.scaling.y -= 0.01;
+      pickedMesh.scaling.z -= 0.01;
+    }
+  });
+  var buttonScale3 = BABYLON.GUI.Button.CreateSimpleButton("but1", "+1");
+  buttonScale3.widthInPixels = ToolButtonWidth2;
+  buttonScale3.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonScale3.color = "white";
+  buttonScale3.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 2;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.scaling.x += 0.01;
+      pickedMesh.scaling.y += 0.01;
+      pickedMesh.scaling.z += 0.01;
+    }
+  });
+  var buttonScale4 = BABYLON.GUI.Button.CreateSimpleButton("but1", "+5");
+  buttonScale4.widthInPixels = ToolButtonWidth2;
+  buttonScale4.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonScale4.color = "white";
+  buttonScale4.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 2;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.scaling.x += 0.1;
+      pickedMesh.scaling.y += 0.1;
+      pickedMesh.scaling.z += 0.1;
+    }
+  });
+  var buttonRotateX1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "-5");
+  buttonRotateX1.widthInPixels = ToolButtonWidth2;
+  buttonRotateX1.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonRotateX1.color = "white";
+  buttonRotateX1.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 3;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.rotation.x -= 10;
+    }
+  });
+  var buttonRotateX2 = BABYLON.GUI.Button.CreateSimpleButton("but1", "-1");
+  buttonRotateX2.widthInPixels = ToolButtonWidth2;
+  buttonRotateX2.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonRotateX2.color = "white";
+  buttonRotateX2.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 3;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.rotation.x -= 5;
+    }
+  });
+  var buttonRotateX3 = BABYLON.GUI.Button.CreateSimpleButton("but1", "+1");
+  buttonRotateX3.widthInPixels = ToolButtonWidth2;
+  buttonRotateX3.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonRotateX3.color = "white";
+  buttonRotateX3.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 3;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.rotation.x += 5;
+    }
+    console.log("you did it!");
+  });
+  var buttonRotateX4 = BABYLON.GUI.Button.CreateSimpleButton("but1", "+5");
+  buttonRotateX4.widthInPixels = ToolButtonWidth2;
+  buttonRotateX4.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonRotateX4.color = "white";
+  buttonRotateX4.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 3;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.rotation.x += 10;
+    }
+  });
+  var buttonRotateY1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "-5");
+  buttonRotateY1.widthInPixels = ToolButtonWidth2;
+  buttonRotateY1.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonRotateY1.color = "white";
+  buttonRotateY1.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 3;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.rotation.z -= 5;
+    }
+  });
+  var buttonRotateY2 = BABYLON.GUI.Button.CreateSimpleButton("but1", "-1");
+  buttonRotateY2.widthInPixels = ToolButtonWidth2;
+  buttonRotateY2.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonRotateY2.color = "white";
+  buttonRotateY2.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 3;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.rotation.z -= 1;
+    }
+  });
+  var buttonRotateY3 = BABYLON.GUI.Button.CreateSimpleButton("but1", "+1");
+  buttonRotateY3.widthInPixels = ToolButtonWidth2;
+  buttonRotateY3.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonRotateY3.color = "white";
+  buttonRotateY3.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 3;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.rotation.z += 1;
+    }
+  });
+  var buttonRotateY4 = BABYLON.GUI.Button.CreateSimpleButton("but1", "+5");
+  buttonRotateY4.widthInPixels = ToolButtonWidth2;
+  buttonRotateY4.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonRotateY4.color = "white";
+  buttonRotateY4.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 3;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.rotation.x += 5;
+    }
+  });
+  var buttonRotateZ1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "-5");
+  buttonRotateZ1.widthInPixels = ToolButtonWidth2;
+  buttonRotateZ1.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonRotateZ1.color = "white";
+  buttonRotateZ1.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 3;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.rotation.y -= 5;
+    }
+  });
+  var buttonRotateZ2 = BABYLON.GUI.Button.CreateSimpleButton("but1", "-1");
+  buttonRotateZ2.widthInPixels = ToolButtonWidth2;
+  buttonRotateZ2.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonRotateZ2.color = "white";
+  buttonRotateZ2.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 3;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.rotation.y -= 1;
+    }
+  });
+  var buttonRotateZ3 = BABYLON.GUI.Button.CreateSimpleButton("but1", "+1");
+  buttonRotateZ3.widthInPixels = ToolButtonWidth2;
+  buttonRotateZ3.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonRotateZ3.color = "white";
+  buttonRotateZ3.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 3;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.rotation.y += 1;
+    }
+  });
+  var buttonRotateZ4 = BABYLON.GUI.Button.CreateSimpleButton("but1", "+5");
+  buttonRotateZ4.widthInPixels = ToolButtonWidth2;
+  buttonRotateZ4.heightInPixels = ToolButtonWidth2;
+  //button1
+  buttonRotateZ4.color = "white";
+  buttonRotateZ4.onPointerUpObservable.add(function () {
+    //1:移動 2:拡大 3:回転
+    EditTypeNumber = 3;
+    SwitchGizmo();
+    if (pickedMesh) {
+      pickedMesh.rotation.y += 5;
+    }
+  });
+  //パーツ用のパネル
+  var ToolPanel1 = new BABYLON.GUI.StackPanel();
+  ToolPanel1.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+  ToolPanel1.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
+  ToolPanel1.widthInPixels = 400;
+  ToolPanel1.heightInPixels = 700;
+  advancedTexture.addControl(ToolPanel1);
+  ToolPanel1.isVisible = false;
+  var panelHeigh = 70;
+  var tpanel1 = new BABYLON.GUI.StackPanel();
+  //tpanel1.name = "topHorzStack";
+  tpanel1.heightInPixels = panelHeigh;
+  tpanel1.isVertical = false;
+  var tHeaderPanel = new BABYLON.GUI.StackPanel();
+  //tHeaderPanel.name = "topHorzStack";
+  tHeaderPanel.heightInPixels = panelHeigh;
+  tHeaderPanel.isVertical = false;
+  var tpanel3 = new BABYLON.GUI.StackPanel();
+  //tpanel3.name = "topHorzStack";
+  tpanel3.heightInPixels = panelHeigh;
+  tpanel3.isVertical = false;
+  var tpanel4 = new BABYLON.GUI.StackPanel();
+  //tpanel4.name = "topHorzStack";
+  tpanel4.heightInPixels = panelHeigh;
+  tpanel4.isVertical = false;
+  var tpanel5 = new BABYLON.GUI.StackPanel();
+  //tpanel5.name = "topHorzStack";
+  tpanel5.heightInPixels = panelHeigh;
+  tpanel5.isVertical = false;
+  var tpanel6 = new BABYLON.GUI.StackPanel();
+  //tpanel6.name = "topHorzStack";
+  tpanel6.heightInPixels = panelHeigh;
+  tpanel6.isVertical = false;
+  var tpanel7 = new BABYLON.GUI.StackPanel();
+  //tpanel7.name = "topHorzStack";
+  tpanel7.heightInPixels = panelHeigh;
+  tpanel7.isVertical = false;
+  var tpanel8 = new BABYLON.GUI.StackPanel();
+  //tpanel8.name = "topHorzStack";
+  tpanel8.heightInPixels = panelHeigh;
+  tpanel8.isVertical = false;
+  tpanel1.addControl(copyButton);
+  tpanel1.addControl(symmetryButton);
+  tpanel1.addControl(deleteButton);
+
+  ToolPanel1.addControl(tpanel1);
+  tHeaderPanel.addControl(buttonX1);
+  tHeaderPanel.addControl(buttonX2);
+  tHeaderPanel.addControl(button2);
+  tHeaderPanel.addControl(buttonX3);
+  tHeaderPanel.addControl(buttonX4);
+  ToolPanel1.addControl(tHeaderPanel);
+  tpanel3.addControl(buttonY1);
+  tpanel3.addControl(buttonY2);
+  tpanel3.addControl(button3);
+  tpanel3.addControl(buttonY3);
+  tpanel3.addControl(buttonY4);
+  ToolPanel1.addControl(tpanel3);
+  tpanel4.addControl(buttonZ1);
+  tpanel4.addControl(buttonZ2);
+  tpanel4.addControl(button4);
+  tpanel4.addControl(buttonZ3);
+  tpanel4.addControl(buttonZ4);
+  ToolPanel1.addControl(tpanel4);
+  tpanel5.addControl(buttonScale1);
+  tpanel5.addControl(buttonScale2);
+  tpanel5.addControl(button5);
+  tpanel5.addControl(buttonScale3);
+  tpanel5.addControl(buttonScale4);
+  ToolPanel1.addControl(tpanel5);
+  tpanel6.addControl(buttonRotateX1);
+  tpanel6.addControl(buttonRotateX2);
+  tpanel6.addControl(button6);
+  tpanel6.addControl(buttonRotateX3);
+  tpanel6.addControl(buttonRotateX4);
+  ToolPanel1.addControl(tpanel6);
+  tpanel7.addControl(buttonRotateY1);
+  tpanel7.addControl(buttonRotateY2);
+  tpanel7.addControl(button7);
+  tpanel7.addControl(buttonRotateY3);
+  tpanel7.addControl(buttonRotateY4);
+  ToolPanel1.addControl(tpanel7);
+  tpanel8.addControl(buttonRotateZ1);
+  tpanel8.addControl(buttonRotateZ2);
+  tpanel8.addControl(button8);
+  tpanel8.addControl(buttonRotateZ3);
+  tpanel8.addControl(buttonRotateZ4);
+  ToolPanel1.addControl(tpanel8);
+  //モーダル
+  var rectangle = new BABYLON.GUI.Rectangle("rect");
+  rectangle.background = "black";
+  rectangle.color = "white";
+  rectangle.width = "400px";
+  rectangle.height = "200px";
+  //apply line spacing on enter
+  rectangle.onPointerDownObservable.add(() => {
+    //alert("xx");
+    rectangle.isVisible = false;
+  });
+  advancedTexture.addControl(rectangle);
+  rectangle.isVisible = false;
+  /*
+  var text1 = new BABYLON.GUI.TextBlock("text1");
+  text1.fontFamily = "Helvetica";
+  text1.textWrapping = true;
+  text1.text = "さまざまなパーツを組み合わせて、\n自分だけのオリジナルの\n動物を作りましょう！(" + Version + ")";
+  text1.color = "white";
+  text1.fontSize = "14px";
+  rectangle.addControl(text1);
+  */
+  SwitchButtonOnOff();
+  return scene;
+};
+
+function SetColor() {
+  var material2 = new BABYLON.StandardMaterial(scene);
+  material2.alpha = 1;
+  //触っていない色
+  material2.diffuseColor = new BABYLON.Color3(1.0, 1.0, 0.7);
+  for (var u = 0; u < PartsArray.length; u++) {
+    if (pickedMesh == PartsArray[u]) {
+      //console.log("aa");
+    } else {
+      PartsArray[u].material = material2;
+    }
+  }
+}
+
+function exportAsSTL(scene) {
+  BABYLON.STLExport.CreateSTL(scene.meshes, true, "decal", false, false);
+}
+window.initFunction = async function () {
+  var asyncEngineCreation = async function () {
+    try {
+      return createDefaultEngine();
+    } catch (e) {
+      console.log("the available createEngine function failed. Creating the default engine instead");
+      return createDefaultEngine();
+    }
+  }
+  window.engine = await asyncEngineCreation();
+  if (!engine) throw 'engine should not be null.';
+  startRenderLoop(engine, canvas);
+  window.scene = createScene();
+};
+initFunction().then(() => {
+  scene.then(returnedScene => {
+    sceneToRender = returnedScene;
+  });
+});
+// Resize
+window.addEventListener("resize", function () {
+  engine.resize();
+});
+    </script>
+</body>
+</html>

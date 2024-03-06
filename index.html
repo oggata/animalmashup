@@ -94,11 +94,11 @@ var createDefaultEngine = function () {
 };
 //パーツを配列に列挙しておく
 var PartsBody = ['parts_body_a1_llama', 'parts_body_a2_bird', 'parts_body_a3_penguin', 'parts_body_a4_gorilla', 'parts_body_a5_lizard', 'parts_body_a6_snake', 'parts_body_a7_shark', 'parts_body_a8_pig', 'parts_body_a9_crocodile']
-var PartsHead = ['parts_head_b1_ostrich', 'parts_head_b2_squirrel', 'parts_head_b3_bear', 'parts_head_b4_bird', 'parts_head_b5_pengin', 'parts_head_b6_shark', 'parts_head_b7_crocodile', 'parts_head_b8_elephant']
-var PartsEar = ['parts_ear_c1_goat', 'parts_ear_c2_dog', 'parts_ear_c3_goat', 'parts_ear_c4_bear', 'parts_ear_c5_rabbit', 'parts_ear_c6_chicken']
+var PartsHead = ['parts_head_b1_ostrich', 'parts_head_b2_squirrel', 'parts_head_b3_bear', 'parts_head_b4_bird', 'parts_head_b5_pengin', 'parts_head_b6_shark', 'parts_head_b7_crocodile', 'parts_head_b8_elephant','parts_head_b10_horse','parts_head_b11_rabbit','parts_head_b12_lion','parts_head_b13_goat']
+var PartsEar = ['parts_ear_c1_goat', 'parts_ear_c2_dog', 'parts_ear_c3_goat', 'parts_ear_c4_bear', 'parts_ear_c5_rabbit', 'parts_ear_c6_chicken','parts_ear_c7_elephant','parts_ear_c8_dog','parts_ear_c10_beetle']
 var PartsLeg = ['parts_leg_d1_duck', 'parts_leg_d2_cat', 'parts_leg_d3_camereon', 'parts_leg_d4_bear', 'parts_leg_d5_house', 'parts_leg_d6_octopus', 'parts_leg_d7_ostrich', 'parts_leg_d8_elephant']
-var PartsTail = ['parts_tail_e1_cat', 'parts_tail_e2_whale', 'parts_tail_e3_raccoon', 'parts_tail_e4_lion', 'parts_tail_e5_dinosaur']
-var PartsOption = ['parts_option_f1_stagbeetle', 'parts_option_f2_squid', 'parts_option_f3_turtle', 'parts_option_f4_bird', 'parts_option_f5_cylinder', 'parts_option_f6_ball' ,'parts_option_f7_triangular', 'parts_option_f7_triangular']
+var PartsTail = ['parts_tail_e1_cat', 'parts_tail_e2_whale', 'parts_tail_e3_raccoon', 'parts_tail_e4_lion', 'parts_tail_e5_dinosaur','parts_tail_e7_pig']
+var PartsOption = ['parts_option_f1_stagbeetle', 'parts_option_f2_squid', 'parts_option_f3_turtle', 'parts_option_f4_bird', 'parts_option_f5_cylinder', 'parts_option_f6_ball' ,'parts_option_f7_triangular']
 //全部pushした配列を作っておく
 var PartsAll = [];
 PartsAll = PartsAll.concat(PartsBody);
@@ -125,9 +125,26 @@ var ImportPartsSTL003 = function (scene, AddParts, fileName) {
     meshes[0].scaling.x = 0.3;
     meshes[0].scaling.y = 0.3;
     meshes[0].scaling.z = 0.3;
+
+    /*
     meshes[0].position.x = getRand(-5, 5);
     meshes[0].position.y = getRand(-5, 5);
     meshes[0].position.z = getRand(-5, 5);
+    */
+
+    meshes[0].position.x = 0
+    meshes[0].position.y = 0;
+    meshes[0].position.z = 0;
+
+
+var material = new BABYLON.StandardMaterial("material", scene);
+material.diffuseColor  = new BABYLON.Color3(1, 0, 1);
+material.specularColor = new BABYLON.Color3(0, 1, 0);
+material.emissiveColor = new BABYLON.Color3(0, 0, 1);
+material.ambientColor  = new BABYLON.Color3(1, 1, 1);
+meshes[0].material = material;
+
+
     AddParts(meshes[0]);
     SwitchButtonOnOff();
   });
@@ -183,6 +200,7 @@ var SwitchGizmo = function () {
 var createScene = async function () {
   // This creates a basic Babylon Scene object (non-mesh)
   var scene = new BABYLON.Scene(engine);
+  scene.clearColor = BABYLON.Color3.FromHexString('#78c9cc');
   var camera = new BABYLON.ArcRotateCamera("camera", 10, 10, 10, new BABYLON.Vector3(0, 10, 0), scene);
   camera.setTarget(BABYLON.Vector3.Zero());
   // Limit camera radius
@@ -516,7 +534,7 @@ var createScene = async function () {
     var ray = scene.createPickingRay(scene.pointerX, scene.pointerY, BABYLON.Matrix.Identity(), camera);
     var hit = scene.pickWithRay(ray);
     if (hit.pickedMesh) {
-      hit.pickedMesh.material = material;
+      //hit.pickedMesh.material = material;
       pickedMesh = hit.pickedMesh;
     } else {
       pickedMesh = null;
@@ -551,16 +569,19 @@ var createScene = async function () {
   copyButton.color = "white";
   copyButton.onPointerUpObservable.add(function () {
     const mesh1 = pickedMesh.clone();
+    //var mesh1 = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 2, segments: 32}, scene);
+    mesh1.position.x = 0;
+    mesh1.position.y = 0;
+    mesh1.position.z = 0;
     //stl出力時に形が崩れるのを防ぐためmerge化する
-    const combined1 = BABYLON.Mesh.MergeMeshes([mesh1],true,true)
-
-
-
-    combined1.position.x = getRand(pickedMesh.position.x-2, pickedMesh.position.x+1);
-    combined1.position.y = getRand(pickedMesh.position.y-2, pickedMesh.position.y+1);
-    combined1.position.z = getRand(pickedMesh.position.z-2, pickedMesh.position.z+1);
-
-
+    var combined1 = BABYLON.Mesh.MergeMeshes([mesh1],true,true);
+    var _x = getRand(pickedMesh.position.x-2, pickedMesh.position.x+1);
+    var _y = getRand(pickedMesh.position.y-2, pickedMesh.position.y+1);
+    var _z = getRand(pickedMesh.position.z-2, pickedMesh.position.z+1);
+    combined1.position.x = _x;
+    combined1.position.y = _y;
+    combined1.position.z = _z;
+    combined1.setPivotPoint(combined1.getBoundingInfo().boundingBox.center);
     AddParts(combined1);
   });
 
@@ -576,16 +597,19 @@ var createScene = async function () {
     
     //const mesh1.rotationQuaternion = pickedMesh.rotationQuaternion.clone();
 
-    //mesh1.scaling.x = -0.3;
-    //mesh1.scaling.y = -0.3;
-    //mesh1.scaling.z = -0.3;
-    //mesh1.rotation.x =  180 * Math.PI / 180;
+    mesh1.scaling.x = -0.3;
+    mesh1.scaling.y = -0.3;
+    mesh1.scaling.z = -0.3;
+    mesh1.rotation.x =  180 * Math.PI / 180;
     //stl出力時に形が崩れるのを防ぐためmerge化する
-    const combined1 = BABYLON.Mesh.MergeMeshes([mesh1],true,true);
-
-    combined1.position.x = getRand(pickedMesh.position.x-2, pickedMesh.position.x+1);
-    combined1.position.y = getRand(pickedMesh.position.y-2, pickedMesh.position.y+1);
-    combined1.position.z = getRand(pickedMesh.position.z-2, pickedMesh.position.z+1);
+    var combined1 = BABYLON.Mesh.MergeMeshes([mesh1],true,true);
+    var _x = getRand(pickedMesh.position.x-2, pickedMesh.position.x+1);
+    var _y = getRand(pickedMesh.position.y-2, pickedMesh.position.y+1);
+    var _z = getRand(pickedMesh.position.z-2, pickedMesh.position.z+1);
+    combined1.position.x = _x;
+    combined1.position.y = _y;
+    combined1.position.z = _z;
+    combined1.setPivotPoint(combined1.getBoundingInfo().boundingBox.center);
 
     AddParts(combined1);
   });
@@ -1187,8 +1211,10 @@ function SetColor() {
   for (var u = 0; u < PartsArray.length; u++) {
     if (pickedMesh == PartsArray[u]) {
       //console.log("aa");
+      PartsArray[u].showBoundingBox = true;
     } else {
-      PartsArray[u].material = material2;
+      //PartsArray[u].material = material2;
+      PartsArray[u].showBoundingBox = false;
     }
   }
 }

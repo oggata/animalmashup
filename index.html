@@ -237,6 +237,18 @@ var createScene = async function () {
   */
   camera.angularSensibilityX = 4000;
   camera.angularSensibilityY = 4000;
+
+    /*
+   // floor
+    const width = 10
+    const height = 10
+    const subdivisions = 10
+    var ground = BABYLON.MeshBuilder.CreateGround("ground", { width, height, subdivisions }, scene, false);
+    var groundMaterial = new BABYLON.GridMaterial("ground", scene);
+    groundMaterial.gridOffset = new BABYLON.Vector3(0.5);
+    ground.material = groundMaterial;
+    */
+
   //var light = new BABYLON.HemisphericLight("hemiLight", new BABYLON.Vector3(10, 10, 0), scene);
   var light2 = new BABYLON.HemisphericLight("hemiLight2", new BABYLON.Vector3(10, -10, 0), scene);
   light2.intensity = 0.1;
@@ -622,11 +634,17 @@ var createScene = async function () {
     mesh1.position.x = 0;
     mesh1.position.y = 0;
     mesh1.position.z = 0;
+    //mesh1.setPivotPoint(mesh1.getBoundingInfo().boundingBox.center);
     //stl出力時に形が崩れるのを防ぐためmerge化する
     var combined1 = BABYLON.Mesh.MergeMeshes([mesh1], true, true);
+    /*
     var _x = getRand(pickedMesh.position.x - 2, pickedMesh.position.x + 1);
     var _y = getRand(pickedMesh.position.y - 2, pickedMesh.position.y + 1);
     var _z = getRand(pickedMesh.position.z - 2, pickedMesh.position.z + 1);
+    */
+    var _x = pickedMesh.position.x - 2;
+    var _y = pickedMesh.position.y;
+    var _z = pickedMesh.position.z;
     combined1.position.x = _x;
     combined1.position.y = _y;
     combined1.position.z = _z;
@@ -638,21 +656,56 @@ var createScene = async function () {
   symmetryButton.heightInPixels = 50;
   symmetryButton.color = "white";
   symmetryButton.onPointerUpObservable.add(function () {
+
+
+    var originX = pickedMesh.position.x;
+    var originY = pickedMesh.position.y;
+    var originZ = pickedMesh.position.z;
+
+    //対象にするために一度原点に戻す
+    pickedMesh.position.x = 0;
+    pickedMesh.position.y = 0;
+    pickedMesh.position.z = 0;
+
+
     const mesh1 = pickedMesh.clone();
     //const mesh1.rotationQuaternion = pickedMesh.rotationQuaternion.clone();
     mesh1.scaling.x = -0.3;
     mesh1.scaling.y = -0.3;
     mesh1.scaling.z = -0.3;
     mesh1.rotation.x = 180 * Math.PI / 180;
+    //mesh1.setPivotPoint(mesh1.getBoundingInfo().boundingBox.center);
+    //var parent = BABYLON.MeshBuilder.CreateSphere("b", {diameter: 1}, scene); 
+    //mesh1.parent = parent;
     //stl出力時に形が崩れるのを防ぐためmerge化する
     var combined1 = BABYLON.Mesh.MergeMeshes([mesh1], true, true);
+    /*
     var _x = getRand(pickedMesh.position.x - 2, pickedMesh.position.x + 1);
     var _y = getRand(pickedMesh.position.y - 2, pickedMesh.position.y + 1);
     var _z = getRand(pickedMesh.position.z - 2, pickedMesh.position.z + 1);
+    */
+
+    /*
+    var _x = pickedMesh.position.x - 2;
+    var _y = pickedMesh.position.y;
+    var _z = pickedMesh.position.z;
     combined1.position.x = _x;
     combined1.position.y = _y;
     combined1.position.z = _z;
+    */
     combined1.setPivotPoint(combined1.getBoundingInfo().boundingBox.center);
+
+
+    //最後に二つのmeshを元に戻す
+    pickedMesh.position.x = originX;
+    pickedMesh.position.y =originY;
+    pickedMesh.position.z = originZ;
+
+    combined1.position.x = originX - 2;
+    combined1.position.y = originY;
+    combined1.position.z = originZ;
+
+
     AddParts(combined1);
   });
   var deleteButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/delete.png?" + Version);

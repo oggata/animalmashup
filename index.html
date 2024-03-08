@@ -651,6 +651,16 @@ var createScene = async function () {
     combined1.position.z = _z;
     //combined1.setPivotPoint(combined1.getBoundingInfo().boundingBox.center);
     AddParts(combined1);
+
+
+
+    pickedMesh = combined1;
+
+      SwitchGizmo();
+      SetColor();
+      ToolPanel.isVisible = false;
+
+
   });
   var symmetryButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/symmetry.png?" + Version);
   symmetryButton.widthInPixels = 90;
@@ -708,6 +718,14 @@ var createScene = async function () {
 
 
     AddParts(combined1);
+
+
+    pickedMesh = combined1;
+
+      SwitchGizmo();
+      SetColor();
+      ToolPanel.isVisible = false;
+
   });
   var deleteButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/delete.png?" + Version);
   deleteButton.widthInPixels = 90;
@@ -1217,7 +1235,7 @@ var createScene = async function () {
   ToolPanel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
   ToolPanel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
   ToolPanel.widthInPixels = 350;
-  ToolPanel.heightInPixels = 700;
+  ToolPanel.heightInPixels = 500;
   advancedTexture.addControl(ToolPanel);
   ToolPanel.isVisible = false;
   var panelHeigh = ToolButtonWidth2;

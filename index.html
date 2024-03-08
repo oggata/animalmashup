@@ -612,7 +612,7 @@ var createScene = async function () {
   }
   // GUI
   //var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-  var ToolButtonWidth = 70;
+  var ToolButtonWidth = 55;
   var button1 = BABYLON.GUI.Button.CreateSimpleButton("but1", "Click Me");
   button1.widthInPixels = ToolButtonWidth;
   button1.heightInPixels = ToolButtonWidth;
@@ -625,7 +625,7 @@ var createScene = async function () {
     SwitchGizmo();
   });
   var copyButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/copy.png?" + Version);
-  copyButton.widthInPixels = 115;
+  copyButton.widthInPixels = 90;
   copyButton.heightInPixels = 50;
   copyButton.color = "white";
   copyButton.onPointerUpObservable.add(function () {
@@ -652,7 +652,7 @@ var createScene = async function () {
     AddParts(combined1);
   });
   var symmetryButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/symmetry.png?" + Version);
-  symmetryButton.widthInPixels = 115;
+  symmetryButton.widthInPixels = 90;
   symmetryButton.heightInPixels = 50;
   symmetryButton.color = "white";
   symmetryButton.onPointerUpObservable.add(function () {
@@ -709,7 +709,7 @@ var createScene = async function () {
     AddParts(combined1);
   });
   var deleteButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/delete.png?" + Version);
-  deleteButton.widthInPixels = 115;
+  deleteButton.widthInPixels = 90;
   deleteButton.heightInPixels = 50;
   deleteButton.onPointerUpObservable.add(function () {
     if (pickedMesh) {
@@ -1215,7 +1215,7 @@ var createScene = async function () {
   ToolPanel = new BABYLON.GUI.StackPanel();
   ToolPanel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
   ToolPanel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
-  ToolPanel.widthInPixels = 500;
+  ToolPanel.widthInPixels = 350;
   ToolPanel.heightInPixels = 700;
   advancedTexture.addControl(ToolPanel);
   ToolPanel.isVisible = false;

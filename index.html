@@ -162,6 +162,7 @@ var ImportPartsSTL003 = function (scene, AddParts, fileName) {
           }
     */
     SwitchGizmo();
+    meshes[0].name = getRand(1,9999);
     AddParts(meshes[0]);
     SwitchButtonOnOff();
   });
@@ -642,6 +643,11 @@ var createScene = async function () {
   deleteButton.heightInPixels = 50;
   deleteButton.onPointerUpObservable.add(function () {
     if (pickedMesh) {
+      for(var i=0;i<PartsArray.length;i++){
+        if(pickedMesh.name == PartsArray[i].name){
+          PartsArray.splice(i,1)
+        }
+      }
       pickedMesh.dispose();
       pickedMesh = null;
       pickedMesh = null;

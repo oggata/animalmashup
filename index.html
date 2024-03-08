@@ -634,6 +634,7 @@ var createScene = async function () {
     mesh1.position.x = 0;
     mesh1.position.y = 0;
     mesh1.position.z = 0;
+    //mesh1.setPivotPoint(0,0,0);
     //mesh1.setPivotPoint(mesh1.getBoundingInfo().boundingBox.center);
     //stl出力時に形が崩れるのを防ぐためmerge化する
     var combined1 = BABYLON.Mesh.MergeMeshes([mesh1], true, true);
@@ -648,7 +649,7 @@ var createScene = async function () {
     combined1.position.x = _x;
     combined1.position.y = _y;
     combined1.position.z = _z;
-    combined1.setPivotPoint(combined1.getBoundingInfo().boundingBox.center);
+    //combined1.setPivotPoint(combined1.getBoundingInfo().boundingBox.center);
     AddParts(combined1);
   });
   var symmetryButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/symmetry.png?" + Version);
@@ -666,7 +667,7 @@ var createScene = async function () {
     pickedMesh.position.x = 0;
     pickedMesh.position.y = 0;
     pickedMesh.position.z = 0;
-
+    //pickedMesh.setPivotPoint(0,0,0);
 
     const mesh1 = pickedMesh.clone();
     //const mesh1.rotationQuaternion = pickedMesh.rotationQuaternion.clone();
@@ -693,7 +694,7 @@ var createScene = async function () {
     combined1.position.y = _y;
     combined1.position.z = _z;
     */
-    combined1.setPivotPoint(combined1.getBoundingInfo().boundingBox.center);
+   // combined1.setPivotPoint(combined1.getBoundingInfo().boundingBox.center);
 
 
     //最後に二つのmeshを元に戻す
@@ -1354,6 +1355,7 @@ function SetColor() {
   for (var u = 0; u < PartsArray.length; u++) {
     if (pickedMesh == PartsArray[u]) {
       //console.log("aa");
+      //pickedMesh.setPivotPoint(pickedMesh.getBoundingInfo().boundingBox.center);
       PartsArray[u].showBoundingBox = true;
     } else {
       //PartsArray[u].material = material2;

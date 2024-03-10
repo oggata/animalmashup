@@ -97,13 +97,13 @@ var pickedMesh = null;
 var buttonIcons = [];
 var buttonIsVisible = false;
 //パーツを配列に列挙しておく
-var PartsBody = ['parts_body_a1_llama', 'parts_body_a2_bird', 'parts_body_a3_penguin', 'parts_body_a4_gorilla', 'parts_body_a5_lizard', 'parts_body_a6_snake', 'parts_body_a7_shark', 'parts_body_a8_pig', 'parts_body_a9_crocodile', 'parts_body_a10_rat', 'parts_body_a11_goat','parts_body_a12_camel']
+var PartsBody = ['parts_body_a1_llama', 'parts_body_a2_bird', 'parts_body_a3_penguin', 'parts_body_a4_gorilla', 'parts_body_a5_lizard', 'parts_body_a6_snake', 'parts_body_a7_shark', 'parts_body_a8_pig', 'parts_body_a9_crocodile', 'parts_body_a10_rat', 'parts_body_a11_goat','parts_body_a12_camel','parts_body_a14_furseal']
 var PartsHead = ['parts_head_b1_ostrich', 'parts_head_b3_bear', 'parts_head_b5_pengin', 'parts_head_b6_shark', 'parts_head_b7_crocodile', 'parts_head_b8_elephant', 'parts_head_b10_horse', 'parts_head_b12_lion', 'parts_head_b13_goat', 'parts_head_b13_frog', 'parts_head_b14_fox','parts_head_b15_rhinoceros','parts_head_b16_giraffe']
 var PartsEar = ['parts_ear_c1_goat', 'parts_ear_c2_dog', 'parts_ear_c3_goat', 'parts_ear_c4_bear', 'parts_ear_c5_rabbit', 'parts_ear_c6_chicken', 'parts_ear_c7_elephant', 'parts_ear_c8_dog', 'parts_ear_c12_goat','parts_ear_c13_giraffe','parts_ear_c14_monkey']
 var PartsLeg = ['parts_leg_d1_duck', 'parts_leg_d2_cat', 'parts_leg_d3_camereon', 'parts_leg_d4_bear', 'parts_leg_d5_house', 'parts_leg_d7_ostrich', 'parts_leg_d8_elephant', 'parts_leg_d10_bird', 'parts_leg_d11_frog', 'parts_leg_d12_gorilla', 'parts_leg_d13_goldsnake','parts_leg_d14_pengin','parts_leg_d15_kangaroo']
 var PartsTail = ['parts_tail_e1_cat', 'parts_tail_e2_whale', 'parts_tail_e3_raccoon', 'parts_tail_e4_lion', 'parts_tail_e5_dinosaur', 'parts_tail_e7_pig','parts_tail_e8_bird','parts_tail_e9_fish']
-var PartsOption = ['parts_option_f1_stagbeetle', 'parts_option_f2_squid', 'parts_option_f3_turtle', 'parts_option_f4_bird', 'parts_option_f5_cylinder', 'parts_option_f6_ball', 'parts_option_f7_triangular','parts_option_f8_beetle','parts_option_f14_octopus','parts_option_f14_shrimphand','parts_option_f14_erimaki']
-var PartsFace = ['parts_face_g1_cat','parts_face_g2_chameleoneye','parts_face_g3_birdbeak','parts_face_g4_dogeye','parts_face_g5_frogeye','parts_face_g6_beavermouse','parts_face_g8_monkeymouse','parts_face_g9_walrus']
+var PartsFace = ['parts_face_g1_cat','parts_face_g2_chameleoneye','parts_face_g3_birdbeak','parts_face_g4_dogeye','parts_face_g5_frogeye','parts_face_g6_beavermouse','parts_face_g8_monkeymouse','parts_face_g9_walrus','parts_face_g12_cat','parts_face_g13_hippo','parts_face_g11_furseal','parts_face_g14_pelican']
+var PartsOption = ['parts_option_f1_stagbeetle', 'parts_option_f2_squid', 'parts_option_f3_turtle', 'parts_option_f4_bird', 'parts_option_f5_cylinder', 'parts_option_f6_ball', 'parts_option_f7_triangular','parts_option_f8_beetle','parts_option_f14_octopus','parts_option_f14_shrimphand','parts_option_f14_erimaki','parts_option_f16_armadillo']
 //全部pushした配列を作っておく
 var PartsAll = [];
 PartsAll = PartsAll.concat(PartsBody);
@@ -361,14 +361,15 @@ var createScene = async function () {
     if(ColorId > ColorArray.length){
       ColorId = 0;
     }
-    var ColorName = ColorArray[ColorId];
     //インポートする前に全てのboundigboxを解除する
     for (var i = 0; i < PartsArray.length; i++) {
+      if(PartsArray[i].material){
         PartsArray[i].material.diffuseColor  = new BABYLON.Color3.FromHexString(ColorArray[ColorId]);;
         PartsArray[i].material.specularColor = new BABYLON.Color3.FromHexString(ColorArray2[ColorId]);;
         PartsArray[i].material.emissiveColor = new BABYLON.Color3.FromHexString(ColorArray2[ColorId]);
         PartsArray[i].material.ambientColor = new BABYLON.Color3.FromHexString(ColorArray[ColorId]);;
         PartsArray[i].material = material;
+      }
     }
   });
   /*
@@ -1365,6 +1366,24 @@ var createScene = async function () {
   rectangle.addControl(text1);
   */
 
+function aaaa(meshes){
+  
+
+                for(var i=0;i<meshes.length;i++){
+
+    var material = new BABYLON.StandardMaterial("material", scene);
+    material.diffuseColor = new BABYLON.Color3(1, 0, 1);
+    material.specularColor = new BABYLON.Color3(0, 1, 0);
+    material.emissiveColor = new BABYLON.Color3(0, 0, 1);
+    material.ambientColor = new BABYLON.Color3(1, 1, 1);
+    meshes[i].material = material;
+
+
+                  console.log("aaaaa");
+                  PartsArray.push(meshes[i]);
+                }
+
+}
 
    var filesInput = new BABYLON.FilesInput(engine, null, scene, null, null, null, function () {
         BABYLON.Tools.ClearLogCache()
@@ -1374,13 +1393,12 @@ var createScene = async function () {
 
         BABYLON.SceneLoader.ImportMesh(
               "",
-              "./stl/",
-              "new_animal.stl",
+              "",
+              file,
               scene,
               function (meshes) {
-                for(var i=0;i<meshes.length;i++){
-                  AddParts(meshes[0]);
-                }
+                console.log(meshes.length);
+                aaaa(meshes);
               }
         );
 

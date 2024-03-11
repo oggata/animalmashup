@@ -255,6 +255,10 @@ var createScene = async function () {
     ground.material = groundMaterial;
     */
 
+
+
+
+
   //var light = new BABYLON.HemisphericLight("hemiLight", new BABYLON.Vector3(10, 10, 0), scene);
   var light2 = new BABYLON.HemisphericLight("hemiLight2", new BABYLON.Vector3(10, -10, 0), scene);
   light2.intensity = 0.1;
@@ -281,6 +285,9 @@ var createScene = async function () {
   var tokenSpacer7 = new BABYLON.GUI.Image("tokenSpacer7", "");
   tokenSpacer7.widthInPixels = 10;
   tokenSpacer7.heightInPixels = 10;
+  var tokenSpacer8 = new BABYLON.GUI.Image("tokenSpacer8", "");
+  tokenSpacer8.widthInPixels = 10;
+  tokenSpacer8.heightInPixels = 10;
   var panel = new BABYLON.GUI.StackPanel();
   panel.name = "mainVertStack";
   panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
@@ -372,6 +379,72 @@ var createScene = async function () {
       }
     }
   });
+
+
+HeaderPanel.addControl(tokenSpacer7);
+    var container = document.createElement('div');
+    container.id = "uploader"; 
+    container.name = "uploader"; 
+    container.style.padding = '5px';
+    container.style.position = 'absolute';
+    container.style.top = '260px';
+    container.style.left = '115px';
+    container.style.borderRadius = '2px';
+    container.style.height = '300px';
+    container.style.width = '500px';
+    container.style.padding = '30px';
+    container.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+    var input = document.createElement('input');
+    input.type = 'file';
+    container.appendChild(input);
+    const btn = document.createElement('button');
+    btn.style.marginLeft = '3px';
+    btn.type = 'button';
+    btn.innerText = 'Load';
+    container.appendChild(btn);
+    engine.getRenderingCanvas().parentElement.appendChild(container);
+    container.style.display = 'none';
+    // events
+    btn.addEventListener('click', () => {
+        container.style.display = 'none';
+        let theFile = input.files && input.files[0];
+        if (!theFile) {
+            console.error('no input file');
+            return;
+        }
+        else{
+            console.log('file ready to use')            
+            BABYLON.SceneLoader.ImportMesh(
+                  "",
+                  "",
+                  theFile,
+                  scene,
+                  function (meshes) {
+                    aaaa(meshes);
+                  }
+            );
+        }
+    });
+    
+  HeaderPanel.addControl(tokenSpacer8);
+  var HeaderMeshconnectButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/file.png?" + Version);
+  HeaderMeshconnectButton.color = "transparent"
+  HeaderMeshconnectButton.widthInPixels = ButtonSizeW;
+  HeaderMeshconnectButton.heightInPixels = ButtonSizeW;
+  HeaderPanel.addControl(HeaderMeshconnectButton);
+  HeaderMeshconnectButton.onPointerDownObservable.add(() => {
+    //const combined = BABYLON.Mesh.MergeMeshes(scene.meshes, true, true)
+    //AddParts(combined);
+
+    if (container.style.display == 'none') {
+     container.style.display = 'block'; 
+    } else {
+      container.style.display = 'none';
+    }
+
+  });
+
+
   /*
   HeaderPanel.addControl(tokenSpacer5);
   var HeaderMeshconnectButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/merge.png?" + Version);
@@ -422,6 +495,14 @@ var createScene = async function () {
     //配列をリセット
     PartsArray=[];
   });
+
+
+
+
+
+
+
+
 
   /////////////////////////////////アイテム表示用パネル
   var AnimalPartsButton1 = new BABYLON.GUI.StackPanel();

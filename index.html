@@ -166,8 +166,15 @@ var ImportPartsSTL003 = function (scene, AddParts, fileName) {
     meshes[0].name = getRand(1,9999);
     AddParts(meshes[0]);
     SwitchButtonOnOff();
+
+    //camera2.setTarget(meshes[0].position);
+
+
   });
 }
+
+var camera2;
+
 var SwitchButtonOnOff = function () {
   if (buttonIsVisible == true) {
     buttonIsVisible = false;
@@ -208,7 +215,17 @@ var SwitchGizmo = function () {
     mGizmo.attachToMesh(null);
   }
 }
+
+var StlOutPutId = 1;
+
 var createScene = async function () {
+
+
+  var AnimalId = getRand(1,999);
+  alert("アニマルIDは" +  AnimalId + "です!");
+  
+
+
   // This creates a basic Babylon Scene object (non-mesh)
   var scene = new BABYLON.Scene(engine);
   scene.clearColor = BABYLON.Color3.FromHexString('#78c9cc');
@@ -244,6 +261,17 @@ var createScene = async function () {
   camera.angularSensibilityX = 1000;
   camera.angularSensibilityY = 1000;
 
+
+
+
+// コンストラクタの引数: name, positoin, scene 
+camera2 = new BABYLON.FollowCamera('FollowCamera', new BABYLON.Vector3(0, 0, 0), scene)
+//camera2.heightOffset = 8;
+//camera2.rotationOffset = 0;
+// カメラの注視点を設定する
+//camera2.lockedTarget = BABYLON.Vector3.Zero()
+//camera2.radius = 90;
+camera2.attachControl(canvas, true);
     /*
    // floor
     const width = 10
@@ -254,6 +282,12 @@ var createScene = async function () {
     groundMaterial.gridOffset = new BABYLON.Vector3(0.5);
     ground.material = groundMaterial;
     */
+
+        //camera2.viewport = new BABYLON.Viewport(0.0, 0.5, 0.5, 0.5);
+
+       //camera.viewport = new BABYLON.Viewport(0.0, 0.0, 1.0, 0.5);
+       //camera2.viewport = new BABYLON.Viewport(0.0, 0.5, 0.5, 0.5);
+       //camera2.viewport = new BABYLON.Viewport(0.0, 0.5, 0.5, 0.5);
 
 
 
@@ -288,6 +322,9 @@ var createScene = async function () {
   var tokenSpacer8 = new BABYLON.GUI.Image("tokenSpacer8", "");
   tokenSpacer8.widthInPixels = 10;
   tokenSpacer8.heightInPixels = 10;
+  var tokenSpacer9 = new BABYLON.GUI.Image("tokenSpacer9", "");
+  tokenSpacer9.widthInPixels = 10;
+  tokenSpacer9.heightInPixels = 10;
   var panel = new BABYLON.GUI.StackPanel();
   panel.name = "mainVertStack";
   panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
@@ -297,7 +334,7 @@ var createScene = async function () {
   HeaderPanel.name = "topHorzStack";
   HeaderPanel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
   HeaderPanel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  HeaderPanel.widthInPixels = 1000;
+  HeaderPanel.widthInPixels = 1200;
   HeaderPanel.heightInPixels = 120;
   HeaderPanel.isVertical = false;
   panel.addControl(HeaderPanel);
@@ -402,6 +439,16 @@ HeaderPanel.addControl(tokenSpacer7);
     btn.type = 'button';
     btn.innerText = 'Load';
     container.appendChild(btn);
+
+    var text = document.createElement('div');
+    text.innerHTML = `
+    <!-- 下記は段落要素 -->
+    <br>
+    <p data-foo="bar">現在のアニマルIDは` + AnimalId + ` / 出力番号は ` + StlOutPutId+ `です</p>
+    `;
+    container.appendChild(text);
+
+
     engine.getRenderingCanvas().parentElement.appendChild(container);
     container.style.display = 'none';
     // events
@@ -457,6 +504,8 @@ HeaderPanel.addControl(tokenSpacer7);
     AddParts(combined);
   });
   */
+
+  
   HeaderPanel.addControl(tokenSpacer6);
   var HeaderScreenshotButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/screenshot.png?" + Version);
   HeaderScreenshotButton.color = "transparent"
@@ -471,6 +520,7 @@ HeaderPanel.addControl(tokenSpacer7);
       texture.useCameraPostProcesses = false;
     });
   });
+  
 
   HeaderPanel.addControl(tokenSpacer3);
   var HeaderDownloadButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/download.png?" + Version);
@@ -489,20 +539,35 @@ HeaderPanel.addControl(tokenSpacer7);
   HeaderDeleteButton.heightInPixels = ButtonSizeW;
   HeaderPanel.addControl(HeaderDeleteButton);
   HeaderDeleteButton.onPointerDownObservable.add(() => {
+
+
+    let checkSaveFlg = window.confirm('さくひんを削除します、よろしいですか？');
+    if(checkSaveFlg) {
+
     for (var i = 0; i < PartsArray.length; i++) {
       PartsArray[i].dispose();
     }
     //配列をリセット
     PartsArray=[];
+
+    }
+
   });
 
-
-
-
-
-
-
-
+  HeaderPanel.addControl(tokenSpacer9);
+  /*
+  var HeaderRecordButton = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/reset.png?" + Version);
+  HeaderRecordButton.color = "transparent"
+  HeaderRecordButton.widthInPixels = ButtonSizeW;
+  HeaderRecordButton.heightInPixels = ButtonSizeW;
+  HeaderPanel.addControl(HeaderRecordButton);
+  HeaderRecordButton.onPointerDownObservable.add(() => {
+    if (BABYLON.VideoRecorder.IsSupported(engine)) {
+        var recorder = new BABYLON.VideoRecorder(engine);
+        recorder.startRecording("test.webm", 2);
+    }
+  });
+  */
 
   /////////////////////////////////アイテム表示用パネル
   var AnimalPartsButton1 = new BABYLON.GUI.StackPanel();
@@ -1513,6 +1578,9 @@ function SetColor() {
 }
 
 function exportAsSTL(scene) {
+
+
+
   //BABYLON.STLExport.CreateSTL(scene.meshes, true, "decal", false, false);
   BABYLON.STLExport.CreateSTL(
     scene.meshes,
@@ -1525,6 +1593,8 @@ function exportAsSTL(scene) {
     true  // exportIndividualMeshes
   );
 
+  alert("アニマルIDは" + StlOutPutId + "で、作成番号は" + StlOutPutId + "で書き出します.");
+  StlOutPutId++;
 
 }
 window.initFunction = async function () {

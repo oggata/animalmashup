@@ -219,6 +219,10 @@ var SwitchGizmo = function () {
 var StlOutPutId = 1;
 var AnimalId = getRand(1,999);
 
+const userAgent = navigator.userAgent;
+console.log("ユーザーエージェント: " + userAgent);
+
+
 var createScene = async function () {
 
 
@@ -553,6 +557,14 @@ HeaderPanel.addControl(tokenSpacer7);
 
     }
 
+
+//pickedMesh.setPivotPoint(pickedMesh.getBoundingInfo().boundingBox.center);
+    //console.log(meshes[i].getBoundingInfo().boundingBox.center.x);
+//pickedMesh.setPivotPoint(pickedMesh.getBoundingInfo().boundingBox.center);
+//var bbb = pickedMesh.getBoundingInfo();
+//pickedMesh.setBoundingInfo(pickedMesh.getBoundingInfo());
+//pickedMesh.position = pickedMesh.getAbsolutePivotPoint();
+
   });
 
   HeaderPanel.addControl(tokenSpacer9);
@@ -730,8 +742,8 @@ HeaderPanel.addControl(tokenSpacer7);
   sGizmo = new BABYLON.ScaleGizmo(gizmoLayer);
   sGizmo.attachedMesh = null;
   // Keep the gizmo fixed to local rotation
-  sGizmo.updateGizmoRotationToMatchAttachedMesh = true;
-  sGizmo.updateGizmoPositionToMatchAttachedMesh = true;
+  //sGizmo.updateGizmoRotationToMatchAttachedMesh = true;
+  //sGizmo.updateGizmoPositionToMatchAttachedMesh = true;
   //ギズモ(回転)
   rGizmo = new BABYLON.RotationGizmo(gizmoLayer, );
   rGizmo.attachedMesh = null;
@@ -749,9 +761,14 @@ HeaderPanel.addControl(tokenSpacer7);
   mGizmo = new BABYLON.GizmoManager(scene);
   mGizmo.snapDistance = 0.5;
   mGizmo.attachToMesh(null);
+
+
+mGizmo.enableAutoPicking = true;
+mGizmo.boundingBoxGizmoEnabled = true;
+
   mGizmo.usePointerToAttachGizmos = false;
   mGizmo.positionGizmoEnabled = true;
-  mGizmo.gizmos.positionGizmo.updateGizmoRotationToMatchAttachedMesh = true;
+  //mGizmo.gizmos.positionGizmo.updateGizmoRotationToMatchAttachedMesh = true;
   var manager = new BABYLON.GUI.GUI3DManager(scene);
   var panel = new BABYLON.GUI.PlanePanel();
   panel.margin = 1.5;
@@ -1525,8 +1542,36 @@ function aaaa(meshes){
     material.ambientColor = new BABYLON.Color3(1, 1, 1);
     meshes[i].material = material;
 
+//meshes[i].setBoundingInfo(new BABYLON.BoundingInfo(new BABYLON.Vector3(-5, -5, -5), new BABYLON.Vector3(5, 5, 5)));
 
-                  console.log("aaaaa");
+/*
+var boundingInfo = meshes[i].getHierarchyBoundingVectors();
+var min = BABYLON.Vector3.Minimize(boundingInfo.min, boundingInfo.min);
+var max = BABYLON.Vector3.Maximize(boundingInfo.max, boundingInfo.max);
+//meshes[i].refreshBoundingInfo();
+meshes[i].setBoundingInfo(new BABYLON.BoundingInfo(min, max));
+*/
+
+//var ccc = meshes[i].getHierarchyBoundingVectors();
+//console.log(ccc.min);
+//var bbb = meshes[i].getBoundingInfo();
+//meshes[i].setBoundingInfo(bbb);
+    console.log(meshes[i].getBoundingInfo().boundingBox.center.x);
+meshes[i].setPivotPoint(meshes[i].getBoundingInfo().boundingBox.center);
+
+
+//meshes[i].setPivotPoint(0,0,0);
+//meshes[i].showBoundingBox = true;
+
+
+
+
+
+
+
+
+
+                  
                   PartsArray.push(meshes[i]);
                 }
 

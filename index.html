@@ -218,7 +218,7 @@ var SwitchGizmo = function () {
 
 var StlOutPutId = 1;
 var AnimalId = getRand(1,999);
-
+var mesh;
 const userAgent = navigator.userAgent;
 console.log("ユーザーエージェント: " + userAgent);
 
@@ -741,12 +741,16 @@ HeaderPanel.addControl(tokenSpacer7);
   //ギズモ(拡大)
   sGizmo = new BABYLON.ScaleGizmo(gizmoLayer);
   sGizmo.attachedMesh = null;
+//sGizmo.boundingBoxGizmoEnabled = true;
   // Keep the gizmo fixed to local rotation
   //sGizmo.updateGizmoRotationToMatchAttachedMesh = true;
   //sGizmo.updateGizmoPositionToMatchAttachedMesh = true;
   //ギズモ(回転)
   rGizmo = new BABYLON.RotationGizmo(gizmoLayer, );
   rGizmo.attachedMesh = null;
+
+//rGizmo.boundingBoxGizmoEnabled = true;
+  
   rGizmo.xGizmo.dragBehavior.onDragObservable.add(() => {
     var currentMatrix = mesh.getWorldMatrix();
     // project matrix Y axis on origin Y axis -> get cosine on Y axis
@@ -757,14 +761,15 @@ HeaderPanel.addControl(tokenSpacer7);
     var angle = Math.atan2(dtY, dtX);
     console.log(angle);
   });
+  
   //ギズモ(移動)
   mGizmo = new BABYLON.GizmoManager(scene);
   mGizmo.snapDistance = 0.5;
-  mGizmo.attachToMesh(null);
+  //mGizmo.attachToMesh(null);
 
 
-mGizmo.enableAutoPicking = true;
-mGizmo.boundingBoxGizmoEnabled = true;
+//mGizmo.enableAutoPicking = true;
+//mGizmo.boundingBoxGizmoEnabled = true;
 
   mGizmo.usePointerToAttachGizmos = false;
   mGizmo.positionGizmoEnabled = true;
@@ -1268,6 +1273,9 @@ mGizmo.boundingBoxGizmoEnabled = true;
     EditTypeNumber = 3;
     SwitchGizmo();
     if (pickedMesh) {
+
+console.log(pickedMesh.rotation.x);
+
       pickedMesh.rotation.x -= 0.1;
     }
   });

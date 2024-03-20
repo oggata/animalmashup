@@ -757,7 +757,6 @@ button1.heightInPixels = ToolButtonWidth;
 //button1.color = "white";
 //button1.background = "green";
 button1.onPointerUpObservable.add(function () {
-  console.log("you did it1!");
   //1:移動 2:拡大 3:回転
   EditTypeNumber = 1;
   SwitchGizmo();
@@ -890,7 +889,6 @@ button4.onPointerUpObservable.add(function () {
   //1:移動 2:拡大 3:回転
   EditTypeNumber = 1;
   SwitchGizmo();
-  console.log("you did it!");
 });
 var button5 = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/scale.png?" + Version);
 button5.widthInPixels = ToolButtonWidth;
@@ -903,7 +901,6 @@ button5.onPointerUpObservable.add(function () {
   //1:移動 2:拡大 3:回転
   EditTypeNumber = 2;
   SwitchGizmo();
-  console.log("you did it!");
 });
 var button6 = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/rotate_r.png?" + Version);
 button6.widthInPixels = ToolButtonWidth;
@@ -913,7 +910,6 @@ button6.heightInPixels = ToolButtonWidth;
 //button6.cornerRadius = 5;
 //button6.background = "green";
 button6.onPointerUpObservable.add(function () {
-  console.log("you did it!");
   //1:移動 2:拡大 3:回転
   EditTypeNumber = 3;
   SwitchGizmo();
@@ -926,7 +922,6 @@ button7.color = "white";
 //button7.cornerRadius = 5;
 //button7.background = "green";
 button7.onPointerUpObservable.add(function () {
-  console.log("you did it!");
   //1:移動 2:拡大 3:回転
   EditTypeNumber = 3;
   SwitchGizmo();
@@ -939,7 +934,6 @@ button8.color = "white";
 //button8.cornerRadius = 5;
 //button8.background = "green";
 button8.onPointerUpObservable.add(function () {
-  console.log("you did it!");
   //1:移動 2:拡大 3:回転
   EditTypeNumber = 3;
   SwitchGizmo();
@@ -1188,7 +1182,6 @@ buttonRotateX1.onPointerUpObservable.add(function () {
   EditTypeNumber = 3;
   SwitchGizmo();
   if (pickedMesh) {
-    console.log(pickedMesh.rotation.x);
     pickedMesh.rotation.x -= 0.1;
   }
 });
@@ -1219,7 +1212,6 @@ buttonRotateX3.onPointerUpObservable.add(function () {
   if (pickedMesh) {
     pickedMesh.rotation.x += 0.05;
   }
-  console.log("you did it!");
 });
 var buttonRotateX4 = BABYLON.GUI.Button.CreateImageOnlyButton("aaa", "./image/button/plus2.png?" + Version);
 //var buttonRotateX4 = BABYLON.GUI.Button.CreateSimpleButton("but1", "+5");

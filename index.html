@@ -679,14 +679,14 @@ var anchor = new BABYLON.TransformNode("");
 gizmoLayer = new BABYLON.UtilityLayerRenderer(scene);
 //gizmoLayer.utilityLayerScene.autoClearDepthAndStencil = false;
 //ギズモ(拡大)
-sGizmo = new BABYLON.ScaleGizmo(gizmoLayer);
+sGizmo = new BABYLON.ScaleGizmo(gizmoLayer,10);
 sGizmo.attachedMesh = null;
 //sGizmo.boundingBoxGizmoEnabled = true;
 // Keep the gizmo fixed to local rotation
 //sGizmo.updateGizmoRotationToMatchAttachedMesh = true;
 //sGizmo.updateGizmoPositionToMatchAttachedMesh = true;
 //ギズモ(回転)
-rGizmo = new BABYLON.RotationGizmo(gizmoLayer, );
+rGizmo = new BABYLON.RotationGizmo(gizmoLayer);
 rGizmo.attachedMesh = null;
 rGizmo.updateGizmoRotationToMatchAttachedMesh = false;
 //rGizmo.boundingBoxGizmoEnabled = true;
@@ -703,7 +703,7 @@ rGizmo.xGizmo.dragBehavior.onDragObservable.add(() => {
 });
 */
 //ギズモ(移動)
-mGizmo = new BABYLON.GizmoManager(scene);
+mGizmo = new BABYLON.GizmoManager(scene,10);
 mGizmo.snapDistance = 0.5;
 //mGizmo.attachToMesh(null);
 //mGizmo.enableAutoPicking = true;
